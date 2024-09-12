@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from model_loader import load_model_parts, inference
+from model_loader import lazy_load_model_parts, inference, unload_model_parts
 import logging
 
 app = Flask(__name__)
@@ -8,8 +8,8 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Global variable to store the loaded model
-model = None
+# Global variable to store the loaded model parts
+model_parts = None
 
 @app.route("/")
 def index():
@@ -17,13 +17,17 @@ def index():
 
 @app.route("/load_model", methods=["POST"])
 def load_model():
-    global model
+    global model_parts
     try:
         model_paths = request.json.get("model_paths", [])
         if not model_paths:
             return jsonify({"error": "No model paths provided"}), 400
 
-        model = load_model_parts(model_paths)
+        # Unload previous model parts if they exist
+        if model_parts:
+            unload_model_parts(model_parts)
+
+        model_parts = lazy_load_model_parts(model_paths)
         return jsonify({"message": "Model loaded successfully"}), 200
     except Exception as e:
         logger.error(f"Error loading model: {str(e)}")
@@ -31,16 +35,16 @@ def load_model():
 
 @app.route("/inference", methods=["POST"])
 def perform_inference():
-    global model
+    global model_parts
     try:
-        if model is None:
+        if model_parts is None:
             return jsonify({"error": "Model not loaded"}), 400
 
         input_data = request.json.get("input_data")
         if input_data is None:
             return jsonify({"error": "No input data provided"}), 400
 
-        result = inference(model, input_data)
+        result = inference(model_parts, input_data)
         return jsonify({"result": result}), 200
     except Exception as e:
         logger.error(f"Error during inference: {str(e)}")
