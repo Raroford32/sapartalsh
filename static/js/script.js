@@ -34,12 +34,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.error) {
                 gpuInfoDiv.innerHTML = `<h3>GPU Info:</h3><p>${data.error}</p>`;
             } else {
-                gpuInfoDiv.innerHTML = `
+                let gpuInfoHTML = `
                     <h3>GPU Info:</h3>
                     <p>GPU Count: ${data.gpu_count}</p>
                     <p>Current Device: ${data.current_device}</p>
-                    <p>Device Name: ${data.device_name}</p>
                 `;
+                data.gpus.forEach((gpu, index) => {
+                    gpuInfoHTML += `
+                        <h4>GPU ${index}:</h4>
+                        <p>Name: ${gpu.name}</p>
+                        <p>Total Memory: ${(gpu.total_memory / (1024 * 1024 * 1024)).toFixed(2)} GB</p>
+                        <p>Free Memory: ${(gpu.free_memory / (1024 * 1024 * 1024)).toFixed(2)} GB</p>
+                        <p>Utilized Memory: ${(gpu.utilized_memory / (1024 * 1024 * 1024)).toFixed(2)} GB</p>
+                    `;
+                });
+                gpuInfoDiv.innerHTML = gpuInfoHTML;
             }
         })
         .catch((error) => {
