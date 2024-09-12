@@ -1,55 +1,49 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const loadModelForm = document.getElementById('loadModelForm');
-    const inferenceForm = document.getElementById('inferenceForm');
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('inputForm');
     const resultDiv = document.getElementById('result');
+    const gpuInfoDiv = document.getElementById('gpuInfo');
 
-    loadModelForm.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', function(e) {
         e.preventDefault();
-        const modelPaths = document.getElementById('modelPaths').value.split(',').map(path => path.trim());
+        const inputData = document.getElementById('inputData').value;
         
-        try {
-            const response = await fetch('/load_model', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ model_paths: modelPaths }),
-            });
-            
-            const data = await response.json();
-            
-            if (response.ok) {
-                resultDiv.textContent = data.message;
-            } else {
-                resultDiv.textContent = `Error: ${data.error}`;
-            }
-        } catch (error) {
-            resultDiv.textContent = `Error: ${error.message}`;
-        }
+        // Convert input string to array of numbers
+        const inputArray = inputData.split(',').map(num => parseFloat(num.trim()));
+
+        fetch('/process', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({input_data: inputArray}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            resultDiv.innerHTML = `<h3>Result:</h3><p>${JSON.stringify(data.result)}</p>`;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            resultDiv.innerHTML = `<h3>Error:</h3><p>${error}</p>`;
+        });
     });
 
-    inferenceForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const inputData = document.getElementById('inputData').value.split(',').map(Number);
-        
-        try {
-            const response = await fetch('/inference', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ input_data: inputData }),
-            });
-            
-            const data = await response.json();
-            
-            if (response.ok) {
-                resultDiv.textContent = `Inference result: ${JSON.stringify(data.result)}`;
+    // Fetch GPU info on page load
+    fetch('/gpu_info')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                gpuInfoDiv.innerHTML = `<h3>GPU Info:</h3><p>${data.error}</p>`;
             } else {
-                resultDiv.textContent = `Error: ${data.error}`;
+                gpuInfoDiv.innerHTML = `
+                    <h3>GPU Info:</h3>
+                    <p>GPU Count: ${data.gpu_count}</p>
+                    <p>Current Device: ${data.current_device}</p>
+                    <p>Device Name: ${data.device_name}</p>
+                `;
             }
-        } catch (error) {
-            resultDiv.textContent = `Error: ${error.message}`;
-        }
-    });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            gpuInfoDiv.innerHTML = `<h3>Error:</h3><p>${error}</p>`;
+        });
 });

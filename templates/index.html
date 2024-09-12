@@ -3,28 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inference Endpoint System</title>
+    <title>DeepSpeed Flask App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Inference Endpoint System</h1>
-        
-        <h2>Load Model</h2>
-        <form id="loadModelForm">
-            <input type="text" id="modelPaths" placeholder="Enter model paths (comma-separated)" required>
-            <button type="submit">Load Model</button>
+        <h1>DeepSpeed Flask App</h1>
+        <form id="inputForm">
+            <label for="inputData">Enter input data (comma-separated numbers):</label><br>
+            <input type="text" id="inputData" name="inputData" required><br>
+            <button type="submit" id="submitBtn">Process</button>
         </form>
-
-        <h2>Perform Inference</h2>
-        <form id="inferenceForm">
-            <input type="text" id="inputData" placeholder="Enter input data (comma-separated numbers)" required>
-            <button type="submit">Run Inference</button>
-        </form>
-
         <div id="result"></div>
+        <div id="gpuInfo"></div>
     </div>
-
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

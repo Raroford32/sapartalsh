@@ -8,9 +8,9 @@ body {
 
 .container {
     max-width: 800px;
-    margin: 0 auto;
-    background-color: #fff;
+    margin: auto;
     padding: 20px;
+    background-color: #fff;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -19,28 +19,31 @@ h1 {
     color: #333;
 }
 
-input[type="text"] {
+#inputForm {
+    margin-bottom: 20px;
+}
+
+#inputData {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
 }
 
-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
+#submitBtn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
     border: none;
-    border-radius: 4px;
     cursor: pointer;
 }
 
-button:hover {
-    background-color: #45a049;
+#submitBtn:hover {
+    background-color: #0056b3;
 }
 
-#result {
+#result, #gpuInfo {
     margin-top: 20px;
     padding: 10px;
-    background-color: #e7e7e7;
-    border-radius: 4px;
+    background-color: #e9ecef;
+    border-radius: 5px;
 }
